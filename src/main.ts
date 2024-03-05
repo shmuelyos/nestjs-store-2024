@@ -1,8 +1,8 @@
-import {NestFactory} from '@nestjs/core';
-import {AppModule} from './app.module';
-import helmet from 'helmet';
-import compression from 'compression';
-import {ConfigService} from '@nestjs/config';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import helmet from "helmet";
+import compression from "compression";
+import { ConfigService } from "@nestjs/config";
 import session from "express-session";
 import MongoStore from 'connect-mongo';
 
