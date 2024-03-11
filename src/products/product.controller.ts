@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { ProductService } from "./product.service";
-import { AuthenticatedGuard } from "../auth/auth.guard";
+import {AuthenticatedGuard, AuthenticatedGuard_EmptyArray} from "../auth/auth.guard";
 import { BaseProduct } from "./interfaces/base.product.interface";
 
 @Controller("product")
@@ -13,14 +13,14 @@ export class ProductController {
   getShelfProducts() {
     return this.productService.getShelfProducts();
   }
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard_EmptyArray)
   @Get("get-basket")
   getBasketProducts(@Req() req) {
     return this.productService.getBasketProducts(req.session.email);
   }
 
 
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard_EmptyArray)
   @Get("get-orders")
   getOrderProducts(@Req() req) {
     return this.productService.getOrderProducts(req.session.email);
