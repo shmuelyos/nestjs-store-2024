@@ -6,6 +6,7 @@ import {ConfigService} from "@nestjs/config";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import fs from "fs";
+import path from "path";
 
 
 async function bootstrap() {
@@ -63,13 +64,18 @@ async function createApp() {
 }
 
 async function setupHttps() {
+    let baseDir = __dirname;
+    if (baseDir.includes('\\dist')) {
+        baseDir = path.join(__dirname, '..');
+    }
+
     const paths = {
-        key: __dirname + '/ssl/cert.key', // Adjusted for simplicity
-        cert: __dirname + '/ssl/cert.crt', // Adjusted for simplicity
+        key: path.join(baseDir, 'ssl', 'cert.key'),
+        cert: path.join(baseDir, 'ssl', 'cert.crt'),
     };
 
     if (!fs.existsSync(paths.key) || !fs.existsSync(paths.cert)) {
-        throw new Error('SSL certificates not found');
+        throw new Error(`SSL certificates not found! path.key: ${paths.key} , path.cert: ${paths.cert}`);
     }
 
     const httpsOptions = {
