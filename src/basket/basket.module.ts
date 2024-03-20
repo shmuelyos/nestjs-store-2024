@@ -1,11 +1,10 @@
-// src/products/products.module.ts
 import {Module} from "@nestjs/common";
+import {BasketController} from "./basket.controller";
+import {ProductService} from "../products/product.service";
 import {MongooseModule} from "@nestjs/mongoose";
-import {ProductService} from "./product.service";
-import {ProductController} from "./product.controller";
-import {BasketProductSchema} from "./schemas/basket.product.schema";
-import {OrderProductSchema} from "./schemas/order.product.schema";
-import {ShelfProductSchema} from "./schemas/shelf.product.schema"; // Assume you define this similarly
+import {BasketProductSchema} from "../products/schemas/basket.product.schema";
+import {OrderProductSchema} from "../products/schemas/order.product.schema";
+import {ShelfProductSchema} from "../products/schemas/shelf.product.schema";
 
 @Module({
     imports: [
@@ -16,7 +15,7 @@ import {ShelfProductSchema} from "./schemas/shelf.product.schema"; // Assume you
         ]),
     ],
     providers: [ProductService],
-    controllers: [ProductController],
+    controllers: [BasketController]
 })
-export class ProductsModule {
+export class BasketModule {
 }

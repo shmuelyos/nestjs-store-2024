@@ -1,14 +1,31 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app.module";
+import {NestFactory} from "@nestjs/core";
+import {AppModule} from "./app.module";
 import helmet from "helmet";
 import compression from "compression";
-import { ConfigService } from "@nestjs/config";
+import {ConfigService} from "@nestjs/config";
 import session from "express-session";
-import MongoStore from 'connect-mongo';
+import MongoStore from "connect-mongo";
+import fs from "fs";
 
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const paths = {
+        key: __dirname.slice(0, -4) + 'ssl\\cert.key',
+        cert: __dirname.slice(0, -4) + 'ssl\\cert.crt',
+    };
+
+    if (!fs.existsSync(paths.key) || !fs.existsSync(paths.cert)) {
+        throw new Error('SSL certificates not found');
+    }
+
+    const httpsOptions = {
+        key: fs.readFileSync(paths.key),
+        cert: fs.readFileSync(paths.cert),
+    };
+
+    const app = await NestFactory.create(AppModule, {
+        httpsOptions,
+    });
     const configService = app.get(ConfigService);
 
     app.use(session({
