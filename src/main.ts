@@ -9,23 +9,8 @@ import fs from "fs";
 
 
 async function bootstrap() {
-    const paths = {
-        key: __dirname.slice(0, -4) + 'ssl\\cert.key',
-        cert: __dirname.slice(0, -4) + 'ssl\\cert.crt',
-    };
+    const app = await createApp();
 
-    if (!fs.existsSync(paths.key) || !fs.existsSync(paths.cert)) {
-        throw new Error('SSL certificates not found');
-    }
-
-    const httpsOptions = {
-        key: fs.readFileSync(paths.key),
-        cert: fs.readFileSync(paths.cert),
-    };
-
-    const app = await NestFactory.create(AppModule, {
-        httpsOptions,
-    });
     const configService = app.get(ConfigService);
 
     app.use(session({
@@ -35,7 +20,7 @@ async function bootstrap() {
             saveUninitialized: false,
             cookie: {
                 maxAge: parseInt(configService.get('SESSION_EXPIRATION')),
-                sameSite: configService.get('SAME_SITE') as 'Lax' | 'Strict' | 'None',
+                sameSite: configService.get('SAME_SITE') as 'lax' | 'strict' | 'none' | boolean,
                 httpOnly: configService.get('HTTP_ONLY') == 'true', // Ensure this is a boolean
                 secure: configService.get('SECURE') == 'true', // Ensure this is a boolean
                 domain: configService.get('COOKIE_DOMAIN'), // You might need to add this for production
@@ -66,6 +51,35 @@ async function bootstrap() {
 
     await app.listen(configService.get('PORT'));
 }
+
+
+async function createApp() {
+    const useHttps = process.env.USE_HTTPS_ON_LOCALHOST == 'true';
+    if (useHttps) {
+        return await setupHttps();
+    } else {
+        return await NestFactory.create(AppModule);
+    }
+}
+
+async function setupHttps() {
+    const paths = {
+        key: __dirname + '/ssl/cert.key', // Adjusted for simplicity
+        cert: __dirname + '/ssl/cert.crt', // Adjusted for simplicity
+    };
+
+    if (!fs.existsSync(paths.key) || !fs.existsSync(paths.cert)) {
+        throw new Error('SSL certificates not found');
+    }
+
+    const httpsOptions = {
+        key: fs.readFileSync(paths.key),
+        cert: fs.readFileSync(paths.cert),
+    };
+
+    return await NestFactory.create(AppModule, {httpsOptions});
+}
+
 
 bootstrap();
 
